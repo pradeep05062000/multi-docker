@@ -1,0 +1,27 @@
+language: generic
+sudo: required
+
+before_install:
+        - docker build -t prad05/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+        - docker run -e CI=true prad05/react-test npm run test
+
+
+after_success:
+        - docker build -t prad05/multi-client ./client
+        - docker build -t prad05/mult-nginx ./nginx
+        - docker build -t prad05/multi-server ./server
+        - docker build -t prad05/multi-worker ./worker
+        # login to the docker CLI
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+        # Take those images and push them to docker hub
+        - docker push prad05/multi-client 
+        - docker push prad05/multi-nginx 
+        - docker push prad05/multi-server 
+        - docker push prad05/multi-worker 
+
+
+
+
