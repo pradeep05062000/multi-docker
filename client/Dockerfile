@@ -7,9 +7,10 @@ WORKDIR /home/node/app
 COPY --chown=node:node ./package.json  ./
 RUN npm install
 COPY --chown=node:node ./ ./
-CMD ["npm","run","build"]
+RUN npm run build
 
 FROM nginx
+USER node
 EXPOSE 3000
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
-COPY --from=0 --chown=node:node /home/node/app/build /usr/share/nginx/html
+COPY --from=0 /home/node/app/build /usr/share/nginx/html
